@@ -16,4 +16,6 @@ public class BniAttribute {
     private String merchantId;
     private String secretKey;
     private boolean logRequest = false;
+    private String username;
+    private String password;
 }

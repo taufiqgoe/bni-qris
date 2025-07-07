@@ -1,6 +1,7 @@
 package id.taufiq.bniqris.util;
 
 import id.taufiq.bniqris.config.BniAttribute;
+import id.taufiq.bniqris.exception.InternalServerErrorException;
 import id.taufiq.bniqris.model.dto.GetAccessTokenResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -27,14 +28,12 @@ public class AccessTokenHelper {
         this.restClient = restClient;
     }
 
-    public String getAccessToken() {
+    public synchronized String getAccessToken() {
         LocalDateTime now = LocalDateTime.now();
         if (this.accessToken == null || this.refreshToken == null) {
             generateAccessToken();
-        } else {
-            if (now.isAfter(this.accessTokenExpiresAt)) {
-                refreshAccessToken();
-            }
+        } else if (now.isAfter(this.accessTokenExpiresAt)) {
+            refreshAccessToken();
         }
 
         return this.accessToken;
@@ -44,8 +43,8 @@ public class AccessTokenHelper {
         String endpoint = "/auth/get-token";
         Map<String, String> requestBody = Map.of(
                 "grant_type", "password",
-                "Username", "username",
-                "Password", "password");
+                "Username", bniAttribute.getUsername(),
+                "Password", bniAttribute.getPassword());
 
         String credential = "%s:%s".formatted(bniAttribute.getClientId(), bniAttribute.getClientSecret());
         String base64Credential = Base64.getEncoder().encodeToString(credential.getBytes(StandardCharsets.UTF_8));
@@ -60,7 +59,8 @@ public class AccessTokenHelper {
                 .toEntity(GetAccessTokenResponse.class);
 
         GetAccessTokenResponse body = entity.getBody();
-        if (body == null) throw new RuntimeException("Empty body");
+        if (body == null)
+            throw new InternalServerErrorException("Failed to get access token: Response body is null. Please check the endpoint or request parameters.");
 
         this.accessToken = body.getAccessToken();
         this.accessTokenExpiresAt = now.plusSeconds(Integer.parseInt(body.getExpiresIn()));
@@ -83,7 +83,8 @@ public class AccessTokenHelper {
                 .toEntity(GetAccessTokenResponse.class);
 
         GetAccessTokenResponse body = entity.getBody();
-        if (body == null) throw new RuntimeException("Empty body");
+        if (body == null)
+            throw new InternalServerErrorException("Failed to refresh access token: Response body is null. Please check the endpoint or request parameters.");
 
         this.accessToken = body.getAccessToken();
         this.accessTokenExpiresAt = now.plusSeconds(Integer.parseInt(body.getExpiresIn()));
