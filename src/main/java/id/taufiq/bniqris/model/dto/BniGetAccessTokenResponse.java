@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetAccessTokenResponse {
+public class BniGetAccessTokenResponse {
     @JsonProperty("access_token")
     private String accessToken;
     @JsonProperty("token_type")

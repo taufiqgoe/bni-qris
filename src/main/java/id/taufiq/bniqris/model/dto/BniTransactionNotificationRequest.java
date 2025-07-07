@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionNotificationRequest {
+public class BniTransactionNotificationRequest {
     @JsonProperty("request_id")
     private String requestId;
 

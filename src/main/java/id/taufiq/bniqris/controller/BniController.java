@@ -1,9 +1,9 @@
 package id.taufiq.bniqris.controller;
 
+import id.taufiq.bniqris.model.dto.BniTransactionNotificationRequest;
+import id.taufiq.bniqris.model.dto.BniTransactionNotificationResponse;
 import id.taufiq.bniqris.model.dto.CheckTransactionStatusResponse;
 import id.taufiq.bniqris.model.dto.GenerateQrCodeResponse;
-import id.taufiq.bniqris.model.dto.TransactionNotificationRequest;
-import id.taufiq.bniqris.model.dto.TransactionNotificationResponse;
 import id.taufiq.bniqris.service.BniService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +24,7 @@ public class BniController {
     }
 
     @PostMapping("transaction-notification")
-    public TransactionNotificationResponse transactionNotification(TransactionNotificationRequest requestBody, HttpServletRequest request) {
+    public BniTransactionNotificationResponse transactionNotification(BniTransactionNotificationRequest requestBody, HttpServletRequest request) {
         String signature = getSignatureOrThrow(request);
         return bniService.transactionNotification(requestBody, signature);
     }

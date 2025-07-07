@@ -60,10 +60,12 @@ public class BniService {
         if (body == null) {
             throw new InternalServerErrorException("Failed to generate QR code: Response body is null. Please check the endpoint or request parameters.");
         }
+
+        messageBroker.send("bni.qris-generate-qr-code", new GenerateQrCodeMessage(amount, body.getBillNumber()));
         return new GenerateQrCodeResponse(body.getQrString(), body.getQrExpired().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
     }
 
-    public TransactionNotificationResponse transactionNotification(TransactionNotificationRequest requestBody, String requestSignature) {
+    public BniTransactionNotificationResponse transactionNotification(BniTransactionNotificationRequest requestBody, String requestSignature) {
         String signature = signatureHelper.hmacSHA512(
                 "%s:%s:%s:%S:%S:%S:%S:%S:%S:%S:%S:%S:%S:%S:%S:%S:%S:%S:%S:%S".formatted(
                         requestBody.getRequestId(),
@@ -94,7 +96,7 @@ public class BniService {
 
         messageBroker.send("bni.qris-transaction-notification", requestBody);
         log.info("Payment processed successfully for requestBody ID: {}", requestBody.getRequestId());
-        return new TransactionNotificationResponse("00", "success");
+        return new BniTransactionNotificationResponse("00", "success");
     }
 
     public CheckTransactionStatusResponse checkTransactionStatus(String billNumber) {

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionNotificationResponse {
-    private String code;
-    private String message;
+public class GenerateQrCodeMessage {
+    private Long amount;
+    private String billNumber;
 }
